@@ -37,4 +37,4 @@ Firefox's "Remote debugging via USB" switch exposes a debugger socket (`localabs
 
 ## 6. Launching opens a new tab every time
 
-Each press of the button sends the URL to Firefox again, and Firefox opens it in a new tab. On a 3 GB box, old tabs pile up. Close them now and then from Firefox's tab list.
+The first version sent the URL to Firefox as an ordinary link, and Firefox opened every press in a new tab. On a 3 GB box, old tabs piled up. The fix is one extra on the intent (`android.support.customtabs.extra.SESSION`), which asks for a **Custom Tab**: a throwaway window that never joins the tab list and closes completely when you press Back. It uses the same engine and runs just as smoothly. Custom Tabs still show a small bar with the page title at the bottom of the screen.
