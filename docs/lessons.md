@@ -38,3 +38,16 @@ Firefox's "Remote debugging via USB" switch exposes a debugger socket (`localabs
 ## 6. Launching opens a new tab every time
 
 The first version sent the URL to Firefox as an ordinary link, and Firefox opened every press in a new tab. On a 3 GB box, old tabs piled up. The fix is one extra on the intent (`android.support.customtabs.extra.SESSION`), which asks for a **Custom Tab**: a throwaway window that never joins the tab list and closes completely when you press Back. It uses the same engine and runs just as smoothly. Custom Tabs still show a small bar with the page title at the bottom of the screen.
+
+## 7. Custom Tabs still show a bar, and the music waited for a click
+
+The Custom Tab left a title bar along the bottom of the screen. gcdatlas publishes no web-app manifest, so Firefox couldn't open it as a full-screen web app either. The site also starts its music only after a first click, and a fresh window hasn't had one.
+
+The fix was to stop handing the URL to a browser at all. The app now embeds **GeckoView**, Firefox's engine as a library (`org.mozilla.geckoview:geckoview-arm64-v8a` from maven.mozilla.org). It draws the page in a full-screen window of its own, grants the page permission to autoplay sound, and taps the page's right edge four seconds after it loads, to count as the first click.
+
+Two build problems, and what fixed them:
+
+- **GeckoView 156 declares that it needs compileSdk 36**, which Android Gradle Plugin 8.5 doesn't support. The app only calls long-standing GeckoView APIs, so `app/build.gradle.kts` switches off that one metadata check (`CheckAarMetadataTask`) instead of upgrading the whole toolchain.
+- **GeckoView ships kotlin-stdlib 2.4**, whose class metadata the Kotlin 1.9 compiler can't read. The activity is plain Java, which avoids the Kotlin compiler entirely.
+
+The cost is size: the APK is about 200 MB. On the Shield, the page rendered full screen and its audio started with no input. One CPU reading, taken 30 seconds after launch while the page was still loading, showed about 270% across the app's processes, against about 120% for Firefox mid-tour; the two haven't been compared under the same conditions.

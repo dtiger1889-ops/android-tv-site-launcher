@@ -7,7 +7,7 @@ Put any website on your Android TV home screen as its own button, and make sure 
 This repo contains two things:
 
 1. **A guide** that starts from a stock Android TV box: turn on debugging, connect from a PC, and install and update apps from the command line.
-2. **A tiny Android TV app** (about 20 lines of Kotlin). Press it on the home screen and it opens one URL in one browser. The version here opens [gcdatlas](https://gcdatlas.com), an ASCII-art atlas of the universe, straight into its 31-stop grand tour. Edit three lines to point it at your own site.
+2. **A small Android TV app** (about 80 lines of Java). Press it on the home screen and it shows one web page full screen: no browser bar, no tabs, and the page's sound can start without a click. It embeds GeckoView, Firefox's engine as a library. The version here opens [gcdatlas](https://gcdatlas.com), an ASCII-art atlas of the universe, straight into its 31-stop grand tour. Edit two lines to point it at your own site.
 
 ![The home-screen banner](assets/home-screen-banner.png)
 
@@ -18,17 +18,16 @@ Tested on an NVIDIA Shield TV Pro (2019, Android 11) in September 2026.
 | Step | Guide |
 |---|---|
 | 1. Turn on developer options and network debugging, then connect with `adb` | [docs/enable-adb-debugging.md](docs/enable-adb-debugging.md) |
-| 2. Pick a browser that actually runs your site well, and update it | [docs/pick-and-update-the-browser.md](docs/pick-and-update-the-browser.md) |
+| 2. Test your site in the browsers you have, and keep them current (why the app uses Firefox's engine) | [docs/pick-and-update-the-browser.md](docs/pick-and-update-the-browser.md) |
 | 3. Build the button app and install it | [below](#build-and-install-the-button) |
 | What went wrong along the way, and why | [docs/lessons.md](docs/lessons.md) |
 
 ## Build and install the button
 
-Needs the Android SDK and JDK 17 or newer (Android Studio ships both).
+Needs the Android SDK and JDK 17 or newer (Android Studio ships both). The first build downloads GeckoView from maven.mozilla.org. The APK is about 200 MB because it carries the whole engine; it's built for arm64 TVs only (the Shield, most Google TV boxes) and needs Android 8.0 or newer.
 
-1. Open `app/build.gradle.kts` and set the three values at the top:
+1. Open `app/build.gradle.kts` and set the two values at the top:
    - `launchUrl`: the page to open.
-   - `browserPackage`: the browser's Android package name (Firefox is `org.mozilla.firefox`).
    - `buttonLabel`: the name shown under the button.
 2. Optional: replace `app/src/main/res/drawable/banner.png` with your own 320 x 180 image. Android TV shows this banner on the home screen.
 3. Build it. On Windows run `gradlew.bat assembleDebug`. On macOS or Linux, run `gradle wrapper` once to create `./gradlew`, then run `./gradlew assembleDebug`. You can also just open the folder in Android Studio.
@@ -40,7 +39,7 @@ Needs the Android SDK and JDK 17 or newer (Android Studio ships both).
 
 5. The button appears in the TV's app list. Long-press it to move it into your favorites row.
 
-The app opens the page and closes itself right away, so pressing Back returns you to the browser, not to an empty app.
+Press Back or Home to leave. The app closes the page as it goes, so nothing keeps playing in the background, and the next press starts fresh.
 
 ## Useful gcdatlas links
 
